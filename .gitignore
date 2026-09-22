@@ -1,0 +1,8 @@
+# software del SRI: no se redistribuye, lo baja setup.sh
+descargas/
+lib/
+build/
+*.class
+.DS_Store
+__pycache__/
+*.pyc
