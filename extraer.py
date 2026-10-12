@@ -133,7 +133,7 @@ def jars_de_eclipse(ruta_exe, destino):
     for trozo, zf in zips_embebidos(pack):
         if set(zf.namelist()) & CLASES_ECLIPSE:
             eclipse += 1
-            escribir(os.path.join(destino, "eclipse-%02d.jar" % eclipse), trozo)
+            escribir(os.path.join(destino, f"eclipse-{eclipse:02d}.jar"), trozo)
 
     if not eclipse:
         raise SystemExit("No se encontraron los jars de Eclipse en el instalador.")
@@ -144,9 +144,9 @@ def main():
     plugin, exe, destino = sys.argv[1], sys.argv[2], sys.argv[3]
     os.makedirs(destino, exist_ok=True)
     n = jars_del_plugin(plugin, destino)
-    print("    jars del validador: %d" % n)
+    print(f"    jars del validador: {n}")
     e = jars_de_eclipse(exe, destino)
-    print("    jars de eclipse   : %d" % e)
+    print(f"    jars de eclipse   : {e}")
     catalogos(destino)
     print("    catalogos en      : ~/.dimmData")
 

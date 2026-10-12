@@ -7,7 +7,6 @@ select = ["E", "F", "W", "I", "B", "UP", "SIM", "S", "BLE"]
 ignore = [
   "E501",    # el largo de línea lo resuelve el formateador
   # pendientes de revisar a mano, ver el issue de hallazgos
-  "UP031",
 ]
 
 [lint.per-file-ignores]
