@@ -28,6 +28,12 @@ CLASES_ECLIPSE = {
 DESCARTAR = ("slf4j-api-1.4.2.jar", "slf4j-simple-1.4.2.jar")
 
 
+def escribir(ruta, datos):
+    """Escribe y cierra el archivo; si falla a medias el error sale aqui."""
+    with open(ruta, "wb") as f:
+        f.write(datos)
+
+
 def jars_del_plugin(ruta_zip, destino):
     """Los jars del plugin, y los jars que cada plugin lleva dentro de lib/."""
     n = 0
@@ -38,7 +44,7 @@ def jars_del_plugin(ruta_zip, destino):
             datos = z.read(nombre)
             base = os.path.basename(nombre)
             if base not in DESCARTAR:
-                open(os.path.join(destino, base), "wb").write(datos)
+                escribir(os.path.join(destino, base), datos)
                 n += 1
             try:
                 with zipfile.ZipFile(io.BytesIO(datos)) as interno:
@@ -48,7 +54,7 @@ def jars_del_plugin(ruta_zip, destino):
                         base_i = os.path.basename(dentro)
                         if base_i in DESCARTAR:
                             continue
-                        open(os.path.join(destino, base_i), "wb").write(interno.read(dentro))
+                        escribir(os.path.join(destino, base_i), interno.read(dentro))
                         n += 1
             except zipfile.BadZipFile:
                 pass
@@ -75,7 +81,7 @@ def zips_embebidos(datos):
                 continue
             trozo = datos[inicio : i + 22 + largo_comentario]
             yield trozo, zipfile.ZipFile(io.BytesIO(trozo))
-        except Exception:
+        except (struct.error, zipfile.BadZipFile):
             continue
 
 
@@ -102,10 +108,10 @@ def catalogos(destino):
                 # el .lck es el candado de una sesion ajena: no se copia
                 if nombre.startswith("resources/bdd_dimm_anexos.") and not nombre.endswith(".lck"):
                     ruta = os.path.join(casa, "BD_DIMM", os.path.basename(nombre))
-                    open(ruta, "wb").write(zf.read(nombre))
+                    escribir(ruta, zf.read(nombre))
                 if nombre.endswith("rig-catalogos-ehcache.xml"):
                     ruta = os.path.join(casa, "ehcache", "rig-catalogos-ehcache.xml")
-                    open(ruta, "wb").write(zf.read(nombre))
+                    escribir(ruta, zf.read(nombre))
             break
 
     if not encontrada:
@@ -127,7 +133,7 @@ def jars_de_eclipse(ruta_exe, destino):
     for trozo, zf in zips_embebidos(pack):
         if set(zf.namelist()) & CLASES_ECLIPSE:
             eclipse += 1
-            open(os.path.join(destino, "eclipse-%02d.jar" % eclipse), "wb").write(trozo)
+            escribir(os.path.join(destino, f"eclipse-{eclipse:02d}.jar"), trozo)
 
     if not eclipse:
         raise SystemExit("No se encontraron los jars de Eclipse en el instalador.")
@@ -138,9 +144,9 @@ def main():
     plugin, exe, destino = sys.argv[1], sys.argv[2], sys.argv[3]
     os.makedirs(destino, exist_ok=True)
     n = jars_del_plugin(plugin, destino)
-    print("    jars del validador: %d" % n)
+    print(f"    jars del validador: {n}")
     e = jars_de_eclipse(exe, destino)
-    print("    jars de eclipse   : %d" % e)
+    print(f"    jars de eclipse   : {e}")
     catalogos(destino)
     print("    catalogos en      : ~/.dimmData")
 
