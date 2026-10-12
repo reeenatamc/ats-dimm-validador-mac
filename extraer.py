@@ -11,6 +11,7 @@ Saca del software oficial del SRI las piezas que necesita el validador:
 Los catalogos van a ~/.dimmData, que es la misma ruta que usa el DIMM real
 (ec.gob.sri.dimm.data.impl.Util.obtenerRutaBDD).
 """
+
 import io
 import os
 import struct
@@ -67,12 +68,12 @@ def zips_embebidos(datos):
             return
         pos = i + 4
         try:
-            tam_dir, ini_dir = struct.unpack("<II", datos[i + 12:i + 20])
-            largo_comentario = struct.unpack("<H", datos[i + 20:i + 22])[0]
+            tam_dir, ini_dir = struct.unpack("<II", datos[i + 12 : i + 20])
+            largo_comentario = struct.unpack("<H", datos[i + 20 : i + 22])[0]
             inicio = i - tam_dir - ini_dir
-            if inicio < 0 or datos[inicio:inicio + 4] != b"PK\x03\x04":
+            if inicio < 0 or datos[inicio : inicio + 4] != b"PK\x03\x04":
                 continue
-            trozo = datos[inicio:i + 22 + largo_comentario]
+            trozo = datos[inicio : i + 22 + largo_comentario]
             yield trozo, zipfile.ZipFile(io.BytesIO(trozo))
         except Exception:
             continue
@@ -99,8 +100,7 @@ def catalogos(destino):
             encontrada = True
             for nombre in nombres:
                 # el .lck es el candado de una sesion ajena: no se copia
-                if nombre.startswith("resources/bdd_dimm_anexos.") \
-                        and not nombre.endswith(".lck"):
+                if nombre.startswith("resources/bdd_dimm_anexos.") and not nombre.endswith(".lck"):
                     ruta = os.path.join(casa, "BD_DIMM", os.path.basename(nombre))
                     open(ruta, "wb").write(zf.read(nombre))
                 if nombre.endswith("rig-catalogos-ehcache.xml"):
@@ -109,8 +109,7 @@ def catalogos(destino):
             break
 
     if not encontrada:
-        raise SystemExit(
-            "No se encontro la base de catalogos dentro del plugin del ATS.")
+        raise SystemExit("No se encontro la base de catalogos dentro del plugin del ATS.")
     if not os.path.exists(os.path.join(destino, "hsqldb.jar")):
         raise SystemExit("Falta hsqldb.jar: sin el no se puede abrir la base.")
 
