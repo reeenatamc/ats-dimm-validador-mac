@@ -81,7 +81,7 @@ def zips_embebidos(datos):
                 continue
             trozo = datos[inicio : i + 22 + largo_comentario]
             yield trozo, zipfile.ZipFile(io.BytesIO(trozo))
-        except Exception:
+        except (struct.error, zipfile.BadZipFile):
             continue
 
 

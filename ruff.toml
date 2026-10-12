@@ -8,8 +8,6 @@ ignore = [
   "E501",    # el largo de línea lo resuelve el formateador
   # pendientes de revisar a mano, ver el issue de hallazgos
   "UP031",
-  "BLE001",
-  "S112",
 ]
 
 [lint.per-file-ignores]
