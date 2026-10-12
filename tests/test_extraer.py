@@ -48,6 +48,13 @@ def test_zips_embebidos_ignora_un_falso_fin_de_zip():
     assert nombres == [["a.txt"]]
 
 
+def test_zips_embebidos_exige_cabecera_local_al_inicio():
+    # un fin de zip suelto (zip vacio) no tiene PK\x03\x04 donde empieza: se salta
+    vacio = hacer_zip({})
+
+    assert list(extraer.zips_embebidos(b"relleno" + vacio)) == []
+
+
 def test_zips_embebidos_no_traga_otros_errores(monkeypatch):
     pack = hacer_zip({"a.txt": b"uno"})
 
